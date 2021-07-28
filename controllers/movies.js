@@ -5,16 +5,14 @@ const ForbiddenError = require('../errors/ForbiddenError');
 
 // возвращает все сохранённые пользователем фильмы
 module.exports.getMovies = (req, res, next) => {
-
   Movie.find({})
-    .orFail(() => new NotFoundError("В избранном ничего нет"))
+    .orFail(() => new NotFoundError('В избранном ничего нет'))
     .then((movies) => res.status(200).send(movies))
     .catch(next);
 };
 
 // создаёт фильм
 module.exports.addMovie = (req, res, next) => {
-
   const {
     country,
     director,
@@ -51,7 +49,6 @@ module.exports.addMovie = (req, res, next) => {
 
 // удаляет сохранённый фильм по id
 module.exports.deleteMovie = (req, res, next) => {
-
   const { movieId } = req.params;
 
   Movie.findById(movieId)

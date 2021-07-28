@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
+const mongoose = require('mongoose');
+const validator = require('validator');
 
 const movieSchema = new mongoose.Schema({
   country: {
@@ -29,7 +29,7 @@ const movieSchema = new mongoose.Schema({
       validator(v) {
         return validator.isURL(v);
       },
-      message: "Введен неверный формат ссылки",
+      message: 'Введен неверный формат ссылки',
     },
   },
   trailer: {
@@ -39,7 +39,7 @@ const movieSchema = new mongoose.Schema({
       validator(v) {
         return validator.isURL(v);
       },
-      message: "Введен неверный формат ссылки",
+      message: 'Введен неверный формат ссылки',
     },
   },
   thumbnail: {
@@ -49,13 +49,13 @@ const movieSchema = new mongoose.Schema({
       validator(v) {
         return validator.isURL(v);
       },
-      message: "Введен неверный формат ссылки",
+      message: 'Введен неверный формат ссылки',
     },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: [true, 'Поле "owner" является обязательным'],
-    ref: "user",
+    ref: 'user',
   },
   movieId: {
     type: Number,
@@ -71,4 +71,4 @@ const movieSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("movie", movieSchema);
+module.exports = mongoose.model('movie', movieSchema);
