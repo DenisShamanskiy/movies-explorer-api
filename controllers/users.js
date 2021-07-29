@@ -1,12 +1,13 @@
 /* eslint-disable import/no-unresolved */
-// const { NODE_ENV, JWT_SECRET } = process.env;
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError');
+const NotAuthError = require('../errors/NotFoundError');
+const NotFoundError = require('../errors/NotFoundError');
 
 // возвращает информацию о пользователе (email и имя)
 module.exports.getUser = (req, res, next) => {
@@ -39,6 +40,20 @@ module.exports.createUser = (req, res, next) => {
         throw new ConflictError(`Пользователь с Email ${req.body.email} уже существует`);
       }
       return next(err);
+    })
+    .catch(next);
+};
+
+// проверяет переданные в теле почту и пароль и возвращает JWT
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+  User.findUserByEmail(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret-key', { expiresIn: '7d' });
+      res.status(200).send({ token });
+    })
+    .catch(() => {
+      throw new NotAuthError('Передан неверный логин или пароль');
     })
     .catch(next);
 };
