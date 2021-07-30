@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
@@ -11,7 +11,8 @@ const NotFoundError = require('../errors/NotFoundError');
 
 // возвращает информацию о пользователе (email и имя)
 module.exports.getUser = (req, res, next) => {
-  User.findById(req.user._id)
+  const id = req.user._id;
+  User.findById(id)
     .orFail(() => new NotFoundError('Пользователь не найден'))
     .then((user) => res.status(200).send(user))
     .catch(next);
@@ -69,5 +70,12 @@ module.exports.updateUser = (req, res, next) => {
         res.status(200).send({ email: user.email, name: user.name });
       }
     })
+    .catch(next);
+};
+
+// возвращает информацию о всех пользователях (не используется на фронте)
+module.exports.getUsers = (req, res, next) => {
+  User.find({})
+    .then((users) => res.status(200).send(users))
     .catch(next);
 };
