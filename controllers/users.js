@@ -5,14 +5,14 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
+const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
 const NotAuthError = require('../errors/NotFoundError');
 const NotFoundError = require('../errors/NotFoundError');
 
 // возвращает информацию о пользователе (email и имя)
 module.exports.getUser = (req, res, next) => {
-  const id = req.user._id;
-  User.findById(id)
+  User.findById(req.user._id)
     .orFail(() => new NotFoundError('Пользователь не найден'))
     .then((user) => res.status(200).send(user))
     .catch(next);
@@ -25,24 +25,28 @@ module.exports.createUser = (req, res, next) => {
     email,
     password,
   } = req.body;
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      email,
-      password: hash,
-    }))
-    .then((user) => res.status(200).send({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-    }))
-    .catch((err) => {
-      if (err.name === 'MongoError' && err.code === 11000) {
-        throw new ConflictError(`Пользователь с Email ${req.body.email} уже существует`);
-      }
-      return next(err);
-    })
-    .catch(next);
+  if (req.body.password.length < 8) {
+    throw new BadRequestError('Пароль менее 8 символов');
+  } else {
+    bcrypt.hash(password, 10)
+      .then((hash) => User.create({
+        name,
+        email,
+        password: hash,
+      }))
+      .then((user) => res.status(200).send({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      }))
+      .catch((err) => {
+        if (err.name === 'MongoError' && err.code === 11000) {
+          throw new ConflictError(`Пользователь с Email ${req.body.email} уже существует`);
+        }
+        return next(err);
+      })
+      .catch(next);
+  }
 };
 
 // проверяет переданные в теле почту и пароль и возвращает JWT
