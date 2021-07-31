@@ -1,8 +1,8 @@
 const CORS_WHITELIST = [
   'http://localhost:3000',
   'http://localhost:8080',
-  'https://shamanskiy.15.nomoredomains.monster',
-  'http://shamanskiy.15.nomoredomains.monster',
+  // 'https://shamanskiy.15.nomoredomains.monster',
+  // 'http://shamanskiy.15.nomoredomains.monster',
 ];
 const corsOption = {
   credentials: true,
