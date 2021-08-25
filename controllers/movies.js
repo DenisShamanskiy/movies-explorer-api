@@ -53,6 +53,14 @@ module.exports.deleteMovie = (req, res, next) => {
 
   Movie.findById(movieId)
     .orFail(() => new NotFoundError("Фильм не найден"))
+    .then((movie) => {
+      if (movie.owner.toString() !== req.user._id) {
+        throw new ForbiddenError(
+          "Вы не можете удалять фильмы других пользователей"
+        );
+      }
+      return movie._id;
+    })
 
     .then((id) =>
       Movie.findByIdAndRemove(id).then(() =>
@@ -61,21 +69,3 @@ module.exports.deleteMovie = (req, res, next) => {
     )
     .catch(next);
 };
-
-// удаляет сохранённый фильм по id
-/*module.exports.deleteMovie = (req, res, next) => {
-  const { movieId } = req.params;
-
-  Movie.findById(movieId)
-    .orFail(() => new NotFoundError('Фильм не найден'))
-    .then((movie) => {
-      if (movie.owner.toString() !== req.user._id) {
-        throw new ForbiddenError('Вы не можете удалять фильмы других пользователей');
-      }
-      return movie._id;
-    })
-
-    .then((id) => Movie.findByIdAndRemove(id)
-      .then(() => res.status(200).send({ message: 'Фильм удален' })))
-    .catch(next);
-};*/
