@@ -5,7 +5,7 @@ const ForbiddenError = require("../errors/ForbiddenError");
 
 // возвращает все сохранённые пользователем фильмы
 module.exports.getMovies = (req, res, next) => {
-  Movie.find({})
+  Movie.find({ owner: req.user._id })
     .orFail(() => new NotFoundError("В избранном ничего нет"))
     .then((movies) => res.status(200).send(movies))
     .catch(next);
